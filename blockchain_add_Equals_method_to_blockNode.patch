@@ -1,0 +1,37 @@
+From c9c87951608158a5cb75c37bfa96a60eefcdb6eb Mon Sep 17 00:00:00 2001
+From: Calvin Kim <calvin@kcalvinalvin.info>
+Date: Mon, 8 Apr 2024 17:45:24 +0900
+Subject: [PATCH] blockchain: add Equals method to blockNode
+
+Helper function for the added IsAncestor in the follow up commit.
+Returns true if all the fields (except for parent and ancestor) are
+equal.
+---
+ blockchain/blockindex.go | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+
+diff --git a/blockchain/blockindex.go b/blockchain/blockindex.go
+index ca3235f79f..9bfa3348cd 100644
+--- a/blockchain/blockindex.go
++++ b/blockchain/blockindex.go
+@@ -135,6 +135,20 @@ func newBlockNode(blockHeader *wire.BlockHeader, parent *blockNode) *blockNode {
+ 	return &node
+ }
+ 
++// Equals compares all the fields of the block node except for the parent and
++// ancestor and returns true if they're equal.
++func (node *blockNode) Equals(other *blockNode) bool {
++	return node.hash == other.hash &&
++		node.workSum.Cmp(other.workSum) == 0 &&
++		node.height == other.height &&
++		node.version == other.version &&
++		node.bits == other.bits &&
++		node.nonce == other.nonce &&
++		node.timestamp == other.timestamp &&
++		node.merkleRoot == other.merkleRoot &&
++		node.status == other.status
++}
++
+ // Header constructs a block header from the node and returns it.
+ //
+ // This function is safe for concurrent access.

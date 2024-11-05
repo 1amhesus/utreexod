@@ -290,6 +290,21 @@ func (b *BlockChain) ProcessBlock(block *btcutil.Block, flags BehaviorFlags) (bo
 		return false, false, err
 	}
 
+	/**
+	// If the block is part of the main chain and Utreexo is enabled, update the Utreexo accumulator state.
+	// Placing this after processOrphans ensures that any orphan blocks dependent on this block
+	// are processed and connected to the main chain first. This way, we only update the Utreexo state
+	// once all relevant blocks are securely part of the main chain, preserving consistency in the accumulator.
+	**/
+	if isMainChain && b.utreexoView != nil {
+		err = b.db.Update(func(dbTx database.Tx) error {
+			return dbPutUtreexoView(dbTx, b.utreexoView, block.Hash())
+		})
+		if err != nil {
+			return false, false, err
+		}
+	}
+
 	log.Debugf("Accepted block %v", blockHash)
 
 	return isMainChain, false, nil

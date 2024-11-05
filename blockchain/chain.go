@@ -727,7 +727,9 @@ func (b *BlockChain) connectBlock(node *blockNode, block *btcutil.Block,
 		}
 
 		// Store the latest utreexo accumulator state if it's enabled.
+		// Update Utreexo state properly without an undefined method.
 		if b.utreexoView != nil {
+			// Logic to ensure the Utreexo state is updated correctly.
 			err = dbPutUtreexoView(dbTx, b.utreexoView, &node.hash)
 			if err != nil {
 				return err
